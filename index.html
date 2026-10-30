@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        var isIframeError = function(err) {
+          if (!err) return false;
+          var msg = '';
+          if (typeof err === 'string') {
+            msg = err;
+          } else if (err.message) {
+            msg = String(err.message);
+          } else {
+            msg = String(err);
+          }
+          return (
+            msg.indexOf('contentWindow') !== -1 ||
+            msg.indexOf('Cannot listen to the event') !== -1 ||
+            msg.indexOf('provided iframe') !== -1
+          );
+        };
+
+        window.addEventListener(
+          'error',
+          function(e) {
+            if (isIframeError(e.message) || isIframeError(e.error)) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+              return true;
+            }
+          },
+          true
+        );
+
+        window.addEventListener(
+          'unhandledrejection',
+          function(e) {
+            if (isIframeError(e.reason)) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+              return true;
+            }
+          },
+          true
+        );
+
+        var prevOnError = window.onerror;
+        window.onerror = function(msg, url, lineNo, colNo, error) {
+          if (isIframeError(msg) || isIframeError(error)) {
+            return true;
+          }
+          if (typeof prevOnError === 'function') {
+            return prevOnError.apply(this, arguments);
+          }
+        };
+      })();
+    </script>
+    <title>Remix مستشار التداول الذكي - البورصة المصرية والأسواق العالمية</title>
+    <meta name="description" content="منصة التداول والتحليل الفني الذكي للبورصة المصرية والأسواق العالمية مع مؤشرات السوبر ترند والماكدي وشارتات TradingView اللحظية" />
+    <meta property="og:title" content="Remix مستشار التداول الذكي - البورصة المصرية والأسواق العالمية" />
+    <meta property="og:description" content="منصة التداول والتحليل الفني الذكي للبورصة المصرية والأسواق العالمية مع مؤشرات السوبر ترند والماكدي وشارتات TradingView اللحظية" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
