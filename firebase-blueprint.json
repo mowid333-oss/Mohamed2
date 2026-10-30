@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information and platform preferences",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "Full display name" },
+        "photoURL": { "type": "string", "description": "Avatar photo URL" },
+        "createdAt": { "type": "string", "description": "Account creation timestamp" },
+        "lastLoginAt": { "type": "string", "description": "Last sign in timestamp" },
+        "soundEnabled": { "type": "boolean", "description": "Whether sound alerts are enabled" }
+      },
+      "required": ["userId", "email"]
+    },
+    "UserAlert": {
+      "title": "UserAlert",
+      "description": "User-configured stock price or event alert rule",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Alert unique ID" },
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "symbol": { "type": "string", "description": "EGX stock symbol (e.g. TMGH, SWDY)" },
+        "stockNameAr": { "type": "string", "description": "Arabic company name" },
+        "condition": {
+          "type": "string",
+          "enum": ["ABOVE_PRICE", "BELOW_PRICE", "CHANGE_UP_PCT", "CHANGE_DOWN_PCT", "VOLUME_SPIKE", "SHARIAH_EVENT"],
+          "description": "Alert trigger condition"
+        },
+        "targetValue": { "type": "number", "description": "Target price or percentage trigger value" },
+        "currentPriceWhenCreated": { "type": "number", "description": "Price at alert creation time" },
+        "isActive": { "type": "boolean", "description": "Whether the alert is actively monitoring" },
+        "isTriggered": { "type": "boolean", "description": "Whether the alert has fired" },
+        "note": { "type": "string", "description": "User note or trade rationale" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "userId", "symbol", "condition", "targetValue", "isActive"]
+    },
+    "UserWatchlistItem": {
+      "title": "UserWatchlistItem",
+      "description": "Stock tracked in the user custom watchlist",
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string", "description": "Stock symbol ticker" },
+        "userId": { "type": "string", "description": "User UID" },
+        "addedAt": { "type": "string", "description": "Timestamp added" },
+        "isFavorite": { "type": "boolean", "description": "Flag for starred favorite" }
+      },
+      "required": ["symbol", "userId"]
+    },
+    "UserPortfolioTrade": {
+      "title": "UserPortfolioTrade",
+      "description": "Recorded trade or position in EGX stocks",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique trade ID" },
+        "userId": { "type": "string", "description": "User UID" },
+        "symbol": { "type": "string", "description": "Stock symbol" },
+        "stockNameAr": { "type": "string", "description": "Arabic stock name" },
+        "entryPrice": { "type": "number", "description": "Buy entry price in EGP" },
+        "shares": { "type": "number", "description": "Number of shares owned" },
+        "targetPrice": { "type": "number", "description": "Profit target price in EGP" },
+        "stopLossPrice": { "type": "number", "description": "Stop loss price in EGP" },
+        "status": { "type": "string", "enum": ["OPEN", "CLOSED"], "description": "Position status" },
+        "notes": { "type": "string", "description": "Trade reasoning and notes" },
+        "openedAt": { "type": "string", "description": "Date opened" }
+      },
+      "required": ["id", "userId", "symbol", "entryPrice", "shares", "status"]
+    },
+    "DailyMarketReport": {
+      "title": "DailyMarketReport",
+      "description": "Automated daily analysis and market commentary for the EGX session",
+      "type": "object",
+      "properties": {
+        "dateStr": { "type": "string", "description": "Date string YYYY-MM-DD" },
+        "headlineAr": { "type": "string", "description": "Main report headline" },
+        "sessionSummaryAr": { "type": "string", "description": "Detailed market session narrative" },
+        "shariahAnalysisAr": { "type": "string", "description": "Analysis of Islamic Shariah stocks movement" },
+        "egx30Change": { "type": "number", "description": "EGX30 index change %" },
+        "totalTurnoverEgp": { "type": "number", "description": "Total traded turnover in Billions EGP" },
+        "topGainers": { "type": "string", "description": "Top performers summary" },
+        "topLosers": { "type": "string", "description": "Decliners summary" },
+        "recommendationsAr": { "type": "string", "description": "Actionable technical recommendations" },
+        "generatedAt": { "type": "string", "description": "Report timestamp" }
+      },
+      "required": ["dateStr", "headlineAr", "sessionSummaryAr", "shariahAnalysisAr"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "User profile document keyed by auth UID"
+    },
+    "/users/{userId}/alerts/{alertId}": {
+      "schema": { "$ref": "UserAlert" },
+      "description": "User-specific stock price and event alerts"
+    },
+    "/users/{userId}/watchlist/{symbol}": {
+      "schema": { "$ref": "UserWatchlistItem" },
+      "description": "User-saved favorite stocks"
+    },
+    "/users/{userId}/portfolio/{tradeId}": {
+      "schema": { "$ref": "UserPortfolioTrade" },
+      "description": "User stock trades journal and portfolio records"
+    },
+    "/dailyReports/{reportDate}": {
+      "schema": { "$ref": "DailyMarketReport" },
+      "description": "Public daily automated EGX analysis reports"
+    }
+  }
+}
